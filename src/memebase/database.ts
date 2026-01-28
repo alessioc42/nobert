@@ -1,6 +1,5 @@
 import { Database } from "bun:sqlite";
-
-const DEFAULT_DB_FILENAME = "database/memebase.db";
+import config from "../config";
 
 class MemeBase {
     private db: Database;
@@ -61,8 +60,7 @@ class MemeBase {
         this.randomMemeStmt = this.db.prepare(`
             SELECT id, author, author_displayname, content, strings, created_at 
             FROM memes ORDER BY RANDOM() 
-            LIMIT 1`
-        );
+            LIMIT 1`);
     }
 
     addMeme(
@@ -163,6 +161,6 @@ class MemeBase {
     }
 }
 
-const defaultMemeBase = new MemeBase(DEFAULT_DB_FILENAME);
+const defaultMemeBase = new MemeBase(config.MEMEBASE_PATH);
 
-export { DEFAULT_DB_FILENAME, defaultMemeBase, MemeBase };
+export { defaultMemeBase, MemeBase };

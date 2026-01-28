@@ -3,8 +3,6 @@ import {
     Events,
     MessageFlags,
 } from "discord.js";
-import ping from "./core/ping";
-import searchMemes from "./core/searchMemes";
 
 import commandList from "./list";
 

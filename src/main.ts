@@ -1,9 +1,9 @@
 import { Client, Collection, Events, GatewayIntentBits } from "discord.js";
 
-import { token } from "../token.json";
 import setupMessageWatcher from "./watchers";
 import setupCommands from "./commands";
 import { defaultMemeBase } from "./memebase/database";
+import config from "./config";
 
 declare module "discord.js" {
   interface Client {
@@ -29,5 +29,9 @@ process.on("SIGINT", () => {
   process.exit();
 });
 
-client.login(token);
+client.on(Events.Error, (error) => {
+  console.error("Discord client error:", error);
+});
+
+client.login(config.DISCORD_TOKEN);
 
