@@ -29,6 +29,4 @@ COPY --from=prerelease /app/tsconfig.json .
 # Create database directory
 RUN mkdir -p /app/database
 
-# Run the app
-USER bun
 ENTRYPOINT ["bun", "run", "src/main.ts"]
