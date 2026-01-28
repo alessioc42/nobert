@@ -61,7 +61,7 @@ export default {
                 message.author.username,
                 message.author.displayName,
                 await compressWebp(buffer),
-                normalizeTextForFTS(ftsString)
+                ftsString
             )
             message.react('✅');
         }
@@ -79,9 +79,4 @@ async function compressWebp(buffer: Buffer): Promise<Buffer> {
     });
     const webp = await resizedImage.webp({ quality: config.MEMEBASE_IMAGE_COMPRESSION_QUALITY });
     return webp.toBuffer();
-}
-
-// lowercase, remove numbers and special characters
-function normalizeTextForFTS(text: string): string {
-    return text.toLowerCase().replace(/[^a-z\s]/g, ' ');
 }

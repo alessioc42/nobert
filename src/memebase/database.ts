@@ -69,6 +69,7 @@ class MemeBase {
         content: Uint8Array,
         strings: string,
     ) {
+        strings = this.normalizeTextForFTS(strings);
         const result = this.insertMemeStmt.run(
             author,
             authorDisplayname,
@@ -101,6 +102,8 @@ class MemeBase {
             created_at: string;
         }
     > {
+        query = this.normalizeTextForFTS(query);
+
         let sql = `
             SELECT m.id, m.author, m.author_displayname, m.content, m.strings, m.created_at
             FROM memes m
@@ -154,6 +157,10 @@ class MemeBase {
             strings: string;
             created_at: string;
         } | null;
+    }
+
+    normalizeTextForFTS(text: string): string {
+        return text.toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\b(\w{3,})s\b/g, '$1');
     }
 
     close() {
