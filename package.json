@@ -8,12 +8,16 @@
     "deploy-commands": "bun src/deploy-commands.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/natural": "^6.0.1"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
-    "discord.js": "^14.25.1"
+    "@gutenye/ocr-node": "^1.4.8",
+    "discord.js": "^14.25.1",
+    "natural": "^8.1.0",
+    "sharp": "^0.34.5"
   }
 }
