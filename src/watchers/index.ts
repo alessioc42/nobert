@@ -1,10 +1,11 @@
 import { Client, Events } from "discord.js";
 import type { Message } from "discord.js";
 
-import memeWatcher from "./core/memeWatcher";
+import memeIndexer from "./core/memeIndexer";
 import frenchWatcher from "./core/french";
 
 import config from "../config";
+// import postIndexer from "./core/postIndexer";
 
 
 // list of handlers by priority. At most one handler will be executed per message
@@ -13,8 +14,9 @@ const handlers: {
   canHandle: (message: Message) => boolean;
   handler: (message: Message) => Promise<void>;
 }[] = [
-  memeWatcher,
-  frenchWatcher
+  memeIndexer,
+  frenchWatcher,
+//  postIndexer
 ];
 
 function setupMessageWatcher(client: Client) {
