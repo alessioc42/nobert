@@ -1,6 +1,6 @@
 import sharp from "sharp";
 import type { Message } from "discord.js";
-import { defaultMemeBase } from "../../memebase/database"
+import { defaultMemeBase } from "../../database/memebase"
 import config from "../../config";
 
 let ocr: any = null;
@@ -22,10 +22,6 @@ type TextLine = {
 export default {
     name: "memeWatcher",
     canHandle: (message: Message): boolean => {
-        if (message.guild?.id !== config.DISCORD_GUILD_ID) {
-            return false;
-        }
-
         if (message.attachments.size === 0) {
             return false;
         }

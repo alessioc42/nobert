@@ -4,6 +4,8 @@ import type { Message } from "discord.js";
 import memeWatcher from "./core/memeWatcher";
 import frenchWatcher from "./core/french";
 
+import config from "../config";
+
 
 // list of handlers by priority. At most one handler will be executed per message
 const handlers: {
@@ -17,6 +19,10 @@ const handlers: {
 
 function setupMessageWatcher(client: Client) {
   client.on(Events.MessageCreate, async (message: Message) => {
+    if (message.guild?.id !== config.DISCORD_GUILD_ID || message.guild?.id === undefined) {
+            return false;
+        }
+
     for (const handler of handlers) {
       try {
         if (handler.canHandle(message)) {

@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import config from "../config";
+import config from "../../config";
 
 class MemeBase {
     private db: Database;
