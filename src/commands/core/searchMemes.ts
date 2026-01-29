@@ -32,7 +32,6 @@ export default {
                     .setDescription('How many days ago to start the search from (default 0)')
                     .setRequired(false)
             )
-                
     )
     .addSubcommand(subcommand => 
         subcommand
@@ -82,6 +81,7 @@ export default {
                 return;
             }
             await interaction.editReply({
+                content: ``,
                 files: [{
                     attachment: Buffer.from(meme.content),
                     name: `meme_${meme.id}.png`,
