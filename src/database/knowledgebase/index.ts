@@ -16,7 +16,7 @@ class Knowledgebase {
         this.db = new sqlite3.Database(filename);
         this.db.exec("PRAGMA journal_mode = WAL;");
 
-        const db = new Database({
+        const db = new Database("knowledgebase", {
             db: this.db,
             type: "integer",
         });
