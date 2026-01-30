@@ -1,4 +1,4 @@
-import { type Message } from "discord.js";
+import { messageLink, type Message } from "discord.js";
 import config from "../../config";
 import { defaultOllamaQueue } from "../../services/llm/index";
 import type { Blob } from "node:buffer";
@@ -29,15 +29,11 @@ export default {
 
         defaultKnowledgebase.updatePost({
             author: message.author.tag,
-            authorDisplayName: message.author.displayName,
+            authorDisplayName: message.member?.displayName || message.author.username,
             text: indexingString,
             hasImage: message.attachments.size > 0,
             timestamp: message.createdAt,
-            messagePath: {
-                guildId: BigInt(message.guild!.id),
-                channelId: BigInt(message.channelId),
-                messageId: BigInt(message.id),
-            }
+            messageURL: message.url,
         })
     },
 }

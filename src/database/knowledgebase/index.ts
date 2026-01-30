@@ -34,7 +34,7 @@ class Knowledgebase {
             author_displayname TEXT,
             preview TEXT,
             has_image INTEGER DEFAULT 0,
-            discord_path TEXT UNIQUE,
+            discord_url TEXT UNIQUE,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );`);
     }
@@ -43,37 +43,28 @@ class Knowledgebase {
         author,
         authorDisplayName,
         hasImage,
-        messagePath,
+        messageURL,
         text,
         timestamp,
     }: {
         author: string;
         authorDisplayName: string;
         hasImage: boolean;
-        messagePath: {
-            guildId: bigint;
-            channelId: bigint;
-            messageId: bigint;
-        };
+        messageURL: string;
         timestamp: Date;
         text: string;
     }): Promise<void> {
         const preview = text.length > this.MAX_PREVIEW_LENGTH
             ? text.slice(0, this.MAX_PREVIEW_LENGTH) + "..."
             : text;
-        const shrinkedDiscordPath = this.discordPathShrinker.encodeKey(
-            messagePath.guildId,
-            messagePath.channelId,
-            messagePath.messageId,
-        );
         const formattedTimestamp = timestamp.toISOString();
 
-        // Check if a post with this discord_path already exists
+        // Check if a post with this discord_url already exists
         const existingId: number | null = await new Promise(
             (resolve, reject) => {
                 this.db.get(
-                    `SELECT id FROM posts WHERE discord_path = ?`,
-                    [shrinkedDiscordPath],
+                    `SELECT id FROM posts WHERE discord_url = ?`,
+                    [messageURL],
                     (err, row: { id: number } | undefined) => {
                         if (err) {
                             reject(err);
@@ -115,13 +106,13 @@ class Knowledgebase {
             // Insert new record
             const dbID: number = await new Promise((resolve, reject) => {
                 this.db.run(
-                    `INSERT INTO posts (author, author_displayname, preview, has_image, discord_path, created_at) VALUES (?, ?, ?, ?, ?, ?);`,
+                    `INSERT INTO posts (author, author_displayname, preview, has_image, discord_url, created_at) VALUES (?, ?, ?, ?, ?, ?);`,
                     [
                         author,
                         authorDisplayName || null,
                         preview || null,
                         hasImage ? 1 : 0,
-                        shrinkedDiscordPath || null,
+                        messageURL || null,
                         formattedTimestamp,
                     ],
                     function (err) {
@@ -165,7 +156,7 @@ class Knowledgebase {
             const placeholders = ids.map(() => "?").join(",");
 
             this.db.all(
-                `SELECT id, author, author_displayname, preview, has_image, discord_path, created_at FROM posts WHERE id IN (${placeholders})`,
+                `SELECT id, author, author_displayname, preview, has_image, discord_url, created_at FROM posts WHERE id IN (${placeholders})`,
                 ids.map((idObj) => idObj.num),
                 (err, rows: any[]) => {
                     if (err) {
@@ -179,9 +170,7 @@ class Knowledgebase {
 
                     const mappedResults = rows.map((row) => ({
                         dbID: row.id,
-                        messageURL: `https://discord.com/channels/${
-                            this.discordPathShrinker.decodeKey(row.discord_path)
-                        }`,
+                        messageURL: row.discord_url,
                         preview: row.preview || "",
                         author: row.author,
                         authorDisplayName: row.author_displayname || "",
@@ -206,30 +195,6 @@ class Knowledgebase {
         });
     }
 
-    private discordPathShrinker = {
-        encodeKey: (
-            guildId: bigint,
-            channelId: bigint,
-            messageId: bigint,
-        ): string => {
-            return `${bigintAsBase36(guildId)}.${bigintAsBase36(channelId)}.${
-                bigintAsBase36(messageId)
-            }`;
-        },
-        decodeKey: (key: string): string => {
-            const parts = key.split(".");
-            if (parts.length !== 3) {
-                throw new Error("Invalid key format");
-            }
-            const strParts = {
-                guildId: base36AsBigint(parts[0]!),
-                channelId: base36AsBigint(parts[1]!),
-                messageId: base36AsBigint(parts[2]!),
-            };
-            return `${strParts.guildId}/${strParts.channelId}/${strParts.messageId}`;
-        },
-    };
-
     close(): void {
         this.db.close();
     }
@@ -240,16 +205,3 @@ export const defaultKnowledgebase = new Knowledgebase(
 );
 
 export default Knowledgebase;
-
-function bigintAsBase36(num: bigint): string {
-    return num.toString(36);
-}
-
-function base36AsBigint(str: string): bigint {
-    const digits = "0123456789abcdefghijklmnopqrstuvwxyz";
-    let result = 0n;
-    for (const char of str.toLowerCase()) {
-        result = result * 36n + BigInt(digits.indexOf(char));
-    }
-    return result;
-}
