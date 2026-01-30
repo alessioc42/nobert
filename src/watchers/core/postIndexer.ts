@@ -15,10 +15,7 @@ export default {
 
         return parentIds.includes(message.channelId) || parentIds.includes(parentId);
     },
-    handler: async (message: Message) => {
-        // const databaseKey = keyTools.encodeKey(Number(message.guild?.id), Number(message.channelId), Number(message.id));
-        // console.log(`Assembled Link: https://discord.com/channels/${message.guild?.id}/${message.channelId}/${message.id}`);
-        
+    handler: async (message: Message) => {        
         let indexingString = `${message.content}`.trim();
 
         for (const attachment of message.attachments.values().filter(att => att.contentType?.startsWith("image/"))) {
@@ -36,9 +33,9 @@ export default {
             text: indexingString,
             hasImage: message.attachments.size > 0,
             messagePath: {
-                guildId: Number(message.guild!.id),
-                channelId: Number(message.channelId),
-                messageId: Number(message.id),
+                guildId: BigInt(message.guild!.id),
+                channelId: BigInt(message.channelId),
+                messageId: BigInt(message.id),
             }
         })
     },
