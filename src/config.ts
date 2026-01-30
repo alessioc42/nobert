@@ -18,6 +18,9 @@ dotenv.config( {
  * 
  *  - OLLAMA_MODEL: Ollama model to use (default: gemma3:4b)
  *  - OLLAMA_API_URL: URL of the Ollama API (default: http://localhost:11434)
+ * 
+ *  - KNOWLEDGEBASE_CHANNEL_IDS: Comma-separated list of channel IDs and parent channel IDs for knowledge bases (Channel, Category and Forum IDs)
+ *  - KNOWLEDGEBASE_DATABASE_PATH: Path to the knowledge base database file (default: ./database/knowledgebase.db)
  */
 
 const config: {
@@ -30,6 +33,8 @@ const config: {
     MEMEBASE_MAX_IMAGE_DIMENSION: number;
     OLLAMA_MODEL: string;
     OLLAMA_API_URL: string;
+    KNOWLEDGEBASE_CHANNEL_IDS: string;
+    KNOWLEDGEBASE_DATABASE_PATH: string;
 } = {
     DISCORD_TOKEN: process.env.DISCORD_TOKEN,
     DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
@@ -45,10 +50,12 @@ const config: {
         : 768,
     OLLAMA_MODEL: process.env.OLLAMA_MODEL || "gemma3:4b",
     OLLAMA_API_URL: process.env.OLLAMA_API_URL || "http://localhost:11434",
+    KNOWLEDGEBASE_CHANNEL_IDS: process.env.KNOWLEDGEBASE_CHANNEL_IDS,
+    KNOWLEDGEBASE_DATABASE_PATH: process.env.KNOWLEDGEBASE_DATABASE_PATH || "./database/knowledgebase.db",
 };
 
 for (const [key, value] of Object.entries(config)) {
-    if (value === undefined) {
+    if (value === undefined || value === null || value === "") {
         console.error(
             `Warning: Configuration variable ${key} is not set. Exiting.`,
         );

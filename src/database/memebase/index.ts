@@ -168,6 +168,6 @@ class MemeBase {
     }
 }
 
-const defaultMemeBase = new MemeBase(config.MEMEBASE_PATH);
+export const defaultMemeBase = new MemeBase(config.MEMEBASE_PATH);
 
-export { defaultMemeBase, MemeBase };
+export default MemeBase;

@@ -40,3 +40,5 @@ token.json
 memebase/*
 memebase.db
 memebase.db-*
+
+database/*

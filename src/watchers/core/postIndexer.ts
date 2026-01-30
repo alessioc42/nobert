@@ -1,41 +1,72 @@
 import { type Message } from "discord.js";
+import config from "../../config";
+import { defaultOllamaQueue } from "../../services/llm/index";
+import type { Blob } from "node:buffer";
+import { defaultKnowledgebase } from "../../database/knowledgebase";
+import sharp from "sharp";
 
 export default {
     name: "postWatcher",
     canHandle: (message: Message): boolean => {
-        console.log(`Forum-ID ${message.channelId}`);
-        console.log(`Guild-ID ${message.guild?.id}`);
-        console.log(`Channel-ID ${message.channel.id}`);
-        console.log(`Message-ID ${message.id}`);
-        console.log(`Assembled Link: https://discord.com/channels/${message.guild?.id}/${message.channelId}/${message.id}`);
-        console.log(`Content: ${message.content}`);
-        console.log(`Forum title: ${message.channelId}`);
-        const key = `${message.guild?.id}/${message.channelId}/${message.id}`;
-        console.log(`Encoded Key: ${keyTools.decodeKey(keyTools.encodeKey(Number(message.guild?.id), Number(message.channelId), Number(message.id)))}`);
-        return false;
+        // @ts-expect-error -- parentId is not in the type definitions, but it exists at runtime
+        const parentId = message.channel["parentId"];
+
+        const parentIds = config.KNOWLEDGEBASE_CHANNEL_IDS?.split(",") || [];
+
+        return parentIds.includes(message.channelId) || parentIds.includes(parentId);
     },
     handler: async (message: Message) => {
-        // TODO: Index
+        // const databaseKey = keyTools.encodeKey(Number(message.guild?.id), Number(message.channelId), Number(message.id));
+        // console.log(`Assembled Link: https://discord.com/channels/${message.guild?.id}/${message.channelId}/${message.id}`);
+        
+        let indexingString = `${message.content}`.trim();
+
+        for (const attachment of message.attachments.values().filter(att => att.contentType?.startsWith("image/"))) {
+            try {
+                const description = await extractImageDescription(attachment.url);
+                indexingString += ` ${description}`;
+            } catch (error) {
+                console.error(`Error extracting image description for attachment ${attachment.url}:`, error);
+            }
+        }
+
+        defaultKnowledgebase.updatePost({
+            author: message.author.tag,
+            authorDisplayName: message.author.displayName,
+            text: indexingString,
+            hasImage: message.attachments.size > 0,
+            messagePath: {
+                guildId: Number(message.guild!.id),
+                channelId: Number(message.channelId),
+                messageId: Number(message.id),
+            }
+        })
     },
 }
 
+const systemPrompt = 
+`Du bist ein Bildersuchmaschinen-Indexing-Bot.
+Anhand eines Bildes gibst du Stichwörter zurück, die dieses Bild beschreiben. Handelt es sich um Text, gib den Text zurück. Handelt es sich um Mathematik, so gebe Stichwörter zu der Mathematik zurück, beispielsweise Verfahrensfragen. Maximal 10 Stichwörter.
 
-const keyTools = {
-    encodeKey: (guildId: number, channelId: number, messageId: number): string => {
-        const toBase64 = (num: number): string => num.toString(36);
-        return `${toBase64(guildId)}.${toBase64(channelId)}.${toBase64(messageId)}`;
-    },
-    decodeKey: (key: string): string => {
-        const parts = key.split('.');
-        if (parts.length !== 3) {
-            throw new Error('Invalid key format');
-        }
-        const fromBase64 = (str: string): string => parseInt(str, 36).toString();
-        const strParts = {
-            guildId: fromBase64(parts[0]!),
-            channelId: fromBase64(parts[1]!),
-            messageId: fromBase64(parts[2]!),
-        };
-        return `${strParts.guildId}/${strParts.channelId}/${strParts.messageId}`;
-    }
+Gebe keine strukturierte Antwort aus. Den Text, sofern vorhanden, zuerst und anschließend pro Zeile die Stichwörter. Trenne diese beiden Bereiche nicht durch Text. Antworte nur auf Deutsch.`;
+
+async function extractImageDescription(attachmentURL: string): Promise<string> {
+    const image = await fetch(attachmentURL);
+    const blob: Blob = await image.blob();
+    const imageSharp = await sharp(Buffer.from(await blob.arrayBuffer())).png().toBuffer();
+    
+    const description = await defaultOllamaQueue.chat({
+        messages: [
+            {
+                role: "system",
+                content: systemPrompt
+            },
+            {
+                role: "user",
+                content: "Describe the content of this image in a concise sentence.",
+                images: [imageSharp.toString('base64')]
+            }
+        ]
+    })
+    return description.message.content.split('\n').map(line => line.trim()).filter(line => line.length > 0).join(' ');
 }

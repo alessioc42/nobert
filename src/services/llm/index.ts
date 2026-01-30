@@ -1,6 +1,7 @@
 // TODO better error handling and logging
 
 import { Ollama, type ChatRequest, type ChatResponse, type GenerateRequest, type GenerateResponse } from 'ollama';
+import config from '../../config';
 
 type QueuePositionCallback = (position: number, total: number) => void;
 
@@ -163,8 +164,8 @@ export class OllamaQueue {
 
 // Default instance with common defaults
 export const defaultOllamaQueue = new OllamaQueue({
-  model: process.env.OLLAMA_MODEL || 'llama3',
-  apiUrl: process.env.OLLAMA_API_URL || 'http://localhost:11434',
+  model: config.OLLAMA_MODEL,
+  apiUrl: config.OLLAMA_API_URL,
   enablePriorityQueue: true,
 });
 

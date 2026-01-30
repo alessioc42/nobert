@@ -5,7 +5,7 @@ import memeIndexer from "./core/memeIndexer";
 import frenchWatcher from "./core/french";
 
 import config from "../config";
-// import postIndexer from "./core/postIndexer";
+import postIndexer from "./core/postIndexer";
 
 
 // list of handlers by priority. At most one handler will be executed per message
@@ -16,7 +16,7 @@ const handlers: {
 }[] = [
   memeIndexer,
   frenchWatcher,
-//  postIndexer
+  postIndexer
 ];
 
 function setupMessageWatcher(client: Client) {
