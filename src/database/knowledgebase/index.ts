@@ -45,6 +45,7 @@ class Knowledgebase {
         hasImage,
         messagePath,
         text,
+        timestamp,
     }: {
         author: string;
         authorDisplayName: string;
@@ -54,6 +55,7 @@ class Knowledgebase {
             channelId: bigint;
             messageId: bigint;
         };
+        timestamp: Date;
         text: string;
     }): Promise<void> {
         const preview = text.length > this.MAX_PREVIEW_LENGTH
@@ -64,6 +66,7 @@ class Knowledgebase {
             messagePath.channelId,
             messagePath.messageId,
         );
+        const formattedTimestamp = timestamp.toISOString();
 
         // Check if a post with this discord_path already exists
         const existingId: number | null = await new Promise(
@@ -86,12 +89,13 @@ class Knowledgebase {
             // Update existing record
             await new Promise<void>((resolve, reject) => {
                 this.db.run(
-                    `UPDATE posts SET author = ?, author_displayname = ?, preview = ?, has_image = ? WHERE id = ?`,
+                    `UPDATE posts SET author = ?, author_displayname = ?, preview = ?, has_image = ?, created_at = ? WHERE id = ?`,
                     [
                         author,
                         authorDisplayName || null,
                         preview || null,
                         hasImage ? 1 : 0,
+                        formattedTimestamp,
                         existingId,
                     ],
                     (err) => {
@@ -111,13 +115,14 @@ class Knowledgebase {
             // Insert new record
             const dbID: number = await new Promise((resolve, reject) => {
                 this.db.run(
-                    `INSERT INTO posts (author, author_displayname, preview, has_image, discord_path) VALUES (?, ?, ?, ?, ?);`,
+                    `INSERT INTO posts (author, author_displayname, preview, has_image, discord_path, created_at) VALUES (?, ?, ?, ?, ?, ?);`,
                     [
                         author,
                         authorDisplayName || null,
                         preview || null,
                         hasImage ? 1 : 0,
                         shrinkedDiscordPath || null,
+                        formattedTimestamp,
                     ],
                     function (err) {
                         if (err) {

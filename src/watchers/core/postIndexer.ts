@@ -32,6 +32,7 @@ export default {
             authorDisplayName: message.author.displayName,
             text: indexingString,
             hasImage: message.attachments.size > 0,
+            timestamp: message.createdAt,
             messagePath: {
                 guildId: BigInt(message.guild!.id),
                 channelId: BigInt(message.channelId),

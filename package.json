@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "bun src/main.ts",
-    "deploy-commands": "bun src/deploy-commands.ts"
+    "deploy-commands": "bun src/scripts/deploy-commands.ts",
+    "index-past-messages": "bun src/scripts/knowledgebase-index-past-messages.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
