@@ -35,7 +35,7 @@ export default {
         let replyMessage = `### Results for \`${query}\`:\n`;
 
         results.forEach((result, index) => {
-            replyMessage += `> **${index + 1 + page * limit}.** ${result.hasImage ? "🖼️" : "💬"} [${result.preview}](${result.messageURL}) by **${result.authorDisplayName || result.author}** *on ${new Date(result.createdAt).toLocaleDateString("de")}*\n`;
+            replyMessage += `> **${index + 1 + page * limit}.** ${result.hasImage ? "🖼️" : "💬"} [${escapeMarkdown(result.preview)}](${result.messageURL}) by **${escapeMarkdown(result.authorDisplayName || result.author)}** *on ${new Date(result.createdAt).toLocaleDateString("de")}*\n`;
         });
 
         await interaction.reply({
@@ -43,3 +43,24 @@ export default {
         });
     },
 };
+
+function escapeMarkdown(text: string): string {
+    return text
+        .replace(/\\/g, '\\\\')
+        .replace(/\*/g, '\\*')
+        .replace(/_/g, '\\_')
+        .replace(/`/g, '\\`')
+        .replace(/~/g, '\\~')
+        .replace(/>/g, '\\>')
+        .replace(/\|/g, '\\|')
+        .replace(/\[/g, '\\[')
+        .replace(/\]/g, '\\]')
+        .replace(/\(/g, '\\(')
+        .replace(/\)/g, '\\)')
+        .replace(/#/g, '\\#')
+        .replace(/\+/g, '\\+')
+        .replace(/-/g, '\\-')
+        .replace(/=/g, '\\=')
+        .replace(/!/g, '\\!')
+        .replace(/\./g, '\\.');
+}
