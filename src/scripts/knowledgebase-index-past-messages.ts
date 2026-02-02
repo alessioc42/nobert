@@ -60,9 +60,8 @@ async function indexer() {
     const messages = await thread.messages.fetch({ limit: 100 });
     console.log(`Fetched ${messages.size} messages from thread ${thread.name}`);
 
-    postIndexer.handler = postIndexer.handler.bind(postIndexer);
-
     for (const message of messages.values()) {
+      console.log(`Processing message ID: ${message.id} (Thread: ${thread.name})`);
       if (postIndexer.canHandle(message)) {
         await postIndexer.handler(message);
       }
