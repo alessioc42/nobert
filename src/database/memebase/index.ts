@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import config from "../config";
+import config from "../../config";
 
 class MemeBase {
     private db: Database;
@@ -168,6 +168,6 @@ class MemeBase {
     }
 }
 
-const defaultMemeBase = new MemeBase(config.MEMEBASE_PATH);
+export const defaultMemeBase = new MemeBase(config.MEMEBASE_PATH);
 
-export { defaultMemeBase, MemeBase };
+export default MemeBase;

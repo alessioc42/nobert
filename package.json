@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "bun src/main.ts",
-    "deploy-commands": "bun src/deploy-commands.ts"
+    "deploy-commands": "bun src/scripts/deploy-commands.ts",
+    "index-past-messages": "bun src/scripts/knowledgebase-index-past-messages.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -18,7 +19,10 @@
     "@gutenye/ocr-node": "^1.4.8",
     "discord.js": "^14.25.1",
     "dotenv": "^17.2.3",
+    "flexsearch": "^0.8.212",
     "natural": "^8.1.0",
-    "sharp": "^0.34.5"
+    "ollama": "^0.6.3",
+    "sharp": "^0.34.5",
+    "sqlite3": "^5.1.7"
   }
 }

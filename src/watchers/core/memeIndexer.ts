@@ -1,6 +1,6 @@
 import sharp from "sharp";
 import type { Message } from "discord.js";
-import { defaultMemeBase } from "../../memebase/database"
+import { defaultMemeBase } from "../../database/memebase"
 import config from "../../config";
 
 let ocr: any = null;
@@ -22,15 +22,13 @@ type TextLine = {
 export default {
     name: "memeWatcher",
     canHandle: (message: Message): boolean => {
-        if (message.guild?.id !== config.DISCORD_GUILD_ID) {
-            return false;
-        }
-
         if (message.attachments.size === 0) {
             return false;
         }
 
-        let memeChannels = message.guild?.channels.cache.filter(c => c.name.includes("meme") || c.name.includes("halloffame"));
+        let indexingChannelNamesAndIds = config.MEMEBASE_INDEXING_CHANNELS.split(',').map(c => c.trim());
+
+        let memeChannels = message.guild?.channels.cache.filter(c => indexingChannelNamesAndIds.includes(c.name) || indexingChannelNamesAndIds.includes(c.id));
 
         let foundChannel = false;
         for (let c of memeChannels?.values() || []) {
@@ -70,13 +68,13 @@ export default {
 
 
 async function compressWebp(buffer: Buffer): Promise<Buffer> {
-    const image = sharp(buffer);
+    const image = sharp(buffer, { animated: true });
     const resizedImage = image.resize({
         width: config.MEMEBASE_MAX_IMAGE_DIMENSION,
         height: config.MEMEBASE_MAX_IMAGE_DIMENSION,
         fit: 'inside',
         withoutEnlargement: true
     });
-    const webp = await resizedImage.webp({ quality: config.MEMEBASE_IMAGE_COMPRESSION_QUALITY });
-    return webp.toBuffer();
+    const webp = resizedImage.webp({ quality: config.MEMEBASE_IMAGE_COMPRESSION_QUALITY });
+    return await webp.toBuffer();
 }

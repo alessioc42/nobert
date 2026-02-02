@@ -2,7 +2,7 @@ import { Client, Collection, Events, GatewayIntentBits } from "discord.js";
 
 import setupMessageWatcher from "./watchers";
 import setupCommands from "./commands";
-import { defaultMemeBase } from "./memebase/database";
+import { defaultMemeBase } from "./database/memebase/";
 import config from "./config";
 
 declare module "discord.js" {
