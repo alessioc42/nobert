@@ -11,7 +11,7 @@ declare module "discord.js" {
   }
 }
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers] });
 
 client.once(Events.ClientReady, (c) => {
   console.log(`Ready! Logged in as ${c.user.tag}`);
@@ -34,4 +34,3 @@ client.on(Events.Error, (error) => {
 });
 
 client.login(config.DISCORD_TOKEN);
-

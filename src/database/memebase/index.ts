@@ -159,6 +159,36 @@ class MemeBase {
         } | null;
     }
 
+    // returns top 5 authors with most memes between startDate and endDate
+    leaderboardByAuthor(startDate?: Date, endDate?: Date): Array<{ name: string; displayname: string; value: number }> {
+        const limit = 5;
+        let sql = `
+            SELECT author AS name, author_displayname AS displayname, COUNT(*) AS value
+            FROM memes
+        `;
+        const params: string[] = [];
+
+        if (startDate || endDate) {
+            sql += ` WHERE`;
+            if (startDate) {
+                sql += ` created_at >= ?`;
+                params.push(startDate.toISOString());
+            }
+            if (startDate && endDate) {
+                sql += ` AND`;
+            }
+            if (endDate) {
+                sql += ` created_at <= ?`;
+                params.push(endDate.toISOString());
+            }
+        }
+
+        sql += ` GROUP BY author ORDER BY value DESC LIMIT ${limit}`;
+
+        const stmt = this.db.prepare<{ name: string; displayname: string; value: number }, string[]>(sql);
+        return stmt.all(...params);
+    }
+
     normalizeTextForFTS(text: string): string {
         return text.toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\b(\w{3,})s\b/g, '$1');
     }
