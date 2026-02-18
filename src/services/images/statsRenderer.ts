@@ -12,6 +12,8 @@ export type StatsRendererOptions = {
 }
 
 export async function renderStats(options: StatsRendererOptions): Promise<Buffer> {
+    canvas.registerFont('./src/assets/fonts/arial.ttf', { family: 'Arial' });
+
     const width = 800;
     const height = 520;
     const canvasInstance = canvas.createCanvas(width, height);
