@@ -6,6 +6,7 @@ import path from "path";
 import config from "../../config";
 
 class Knowledgebase {
+    
     MAX_PREVIEW_LENGTH = 60;
 
     private db: sqlite3.Database;
@@ -194,6 +195,47 @@ class Knowledgebase {
             );
         });
     }
+
+    // date fefaults to last 30 days if not provided
+    async leaderboardByAuthor(startDate?: Date, endDate?: Date): Promise<{ name: string; displayname: string; value: number }[]> {
+        const now = new Date();
+        const defaultStartDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        const start = startDate || defaultStartDate;
+        const end = endDate || now;
+
+        const formattedStart = start.toISOString();
+        const formattedEnd = end.toISOString();
+
+        return new Promise((resolve, reject) => {
+            this.db.all(
+                `SELECT 
+                    author as name, 
+                    MAX(author_displayname) as displayname, 
+                    COUNT(*) as value 
+                FROM posts 
+                WHERE created_at >= ? AND created_at <= ? 
+                GROUP BY author 
+                ORDER BY value DESC`,
+                [formattedStart, formattedEnd],
+                (err, rows: any[]) => {
+                    if (err) {
+                        console.error('[Knowledgebase] Leaderboard query error:', err);
+                        reject(err);
+                        return;
+                    }
+                    
+                    const results = rows.map(row => ({
+                        name: row.name,
+                        displayname: row.displayname || '',
+                        value: row.value
+                    }));
+                    
+                    resolve(results);
+                }
+            );
+        });
+    }
+
 
     close(): void {
         this.db.close();
