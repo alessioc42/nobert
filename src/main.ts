@@ -4,6 +4,7 @@ import setupMessageWatcher from "./watchers";
 import setupCommands from "./commands";
 import { defaultMemeBase } from "./database/memebase/";
 import config from "./config";
+import { initializeCrons } from "./cron";
 
 declare module "discord.js" {
   interface Client {
@@ -21,6 +22,8 @@ client.commands = new Collection();
 setupCommands(client);
 
 setupMessageWatcher(client);
+
+initializeCrons(client);
 
 process.on("SIGINT", () => {
   console.log("Received SIGINT. Shutting down...");
