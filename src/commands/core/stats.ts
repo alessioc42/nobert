@@ -3,6 +3,7 @@ import type { CommandInteraction } from "discord.js";
 import { defaultMemeBase } from "../../database/memebase";
 import { renderStats, type StatsRendererOptions } from "../../services/images/statsRenderer";
 import { defaultKnowledgebase } from "../../database/knowledgebase";
+import config from "../../config";
 
 export default {
     data: new SlashCommandBuilder().setName("leaderboards").setDescription(
@@ -43,6 +44,15 @@ export default {
                 files: [render],
             });
         } else if (subcommand === "memes") {
+            if (config.MEMEBASE_ENABLE === false) {
+                await interaction.user.send("You should not do this.");
+                await interaction.reply({
+                    content: "The memebase is currently disabled.",
+                    options: {
+                        flags: ["SuppressNotifications"]
+                    }
+                })
+            }
             const leaderboard = await defaultMemeBase.leaderboardByAuthor();
 
             const leaderboardWithAvatars = await leaderBoardInjectProfilePictures(interaction, {

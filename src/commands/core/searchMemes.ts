@@ -1,8 +1,10 @@
 import { SlashCommandBuilder } from 'discord.js';
 import type { CommandInteraction,  } from 'discord.js';
 import { defaultMemeBase } from '../../database/memebase';
+import config from '../../config';
 
 export default {
+    enabled: config.MEMEBASE_ENABLE,
 	data: new SlashCommandBuilder().setName('memes')
     .setDescription('Interact with the Memes database')
     .addSubcommand(subcommand => 

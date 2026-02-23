@@ -11,6 +11,7 @@ dotenv.config( {
  *  - DISCORD_CLIENT_ID: Discord bot client ID
  *  - DISCORD_GUILD_ID: Discord server (guild) ID
  * 
+ *  - MEMEBASE_ENABLE: Enable memebase functionality (default: true)
  *  - MEMEBASE_INDEXING_CHANNELS: Comma-separated list of channel names/ids to index memes from (default: "meme,halloffame")
  *  - MEMEBASE_PATH: Path to the database file (default: ./database/memebase.db)
  *  - MEMEBASE_IMAGE_COMPRESSION_QUALITY: Image compression quality (default: 60)
@@ -27,6 +28,7 @@ const config: {
     DISCORD_TOKEN: string;
     DISCORD_CLIENT_ID: string;
     DISCORD_GUILD_ID: string;
+    MEMEBASE_ENABLE: boolean;
     MEMEBASE_INDEXING_CHANNELS: string;
     MEMEBASE_PATH: string;
     MEMEBASE_IMAGE_COMPRESSION_QUALITY: number;
@@ -39,6 +41,7 @@ const config: {
     DISCORD_TOKEN: process.env.DISCORD_TOKEN,
     DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
     DISCORD_GUILD_ID: process.env.DISCORD_GUILD_ID,
+    MEMEBASE_ENABLE: process.env.MEMEBASE_ENABLE ? process.env.MEMEBASE_ENABLE.toLowerCase() === "true" : true,
     MEMEBASE_INDEXING_CHANNELS: process.env.MEMEBASE_INDEXING_CHANNELS || "meme,halloffame",
     MEMEBASE_PATH: process.env.MEMEBASE_PATH || "./database/memebase.db",
     MEMEBASE_IMAGE_COMPRESSION_QUALITY:

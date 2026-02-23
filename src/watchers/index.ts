@@ -11,6 +11,7 @@ import postIndexer from "./core/postIndexer";
 // list of handlers by priority. At most one handler will be executed per message
 const handlers: {
   name: string;
+  enabled?: boolean;
   canHandle: (message: Message) => boolean;
   handler: (message: Message) => Promise<void>;
 }[] = [
@@ -27,7 +28,7 @@ function setupMessageWatcher(client: Client) {
 
     for (const handler of handlers) {
       try {
-        if (handler.canHandle(message)) {
+        if (handler.canHandle(message) && (handler.enabled === undefined || handler.enabled)) {
           await handler.handler(message);
           break;
         }

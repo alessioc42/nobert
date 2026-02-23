@@ -21,6 +21,7 @@ type TextLine = {
 
 export default {
     name: "memeWatcher",
+    enabled: config.MEMEBASE_ENABLE,
     canHandle: (message: Message): boolean => {
         if (message.attachments.size === 0) {
             return false;
