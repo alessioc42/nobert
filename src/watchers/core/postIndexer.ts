@@ -4,6 +4,7 @@ import { defaultOllamaQueue } from "../../services/llm/index";
 import type { Blob } from "node:buffer";
 import { defaultKnowledgebase } from "../../database/knowledgebase";
 import sharp from "sharp";
+import { getOcr, type TextLine } from "../../services/ocr";
 
 export default {
     name: "postWatcher",
@@ -18,10 +19,21 @@ export default {
     handler: async (message: Message) => {        
         let indexingString = `${message.content}`.trim();
 
+        const ocrInstance = await getOcr();
+
         for (const attachment of message.attachments.values().filter(att => att.contentType?.startsWith("image/"))) {
+            const image = await fetch(attachment.url);
+            const blob: Blob = await image.blob();
+            const arrayBuffer = await blob.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            const result: TextLine[] = await ocrInstance.detect(buffer);
+            console.log(`MemeWatcher: OCR detected ${result.length} text lines`);
+            const ocrDetect = result.filter(line => line.mean > 0.94).map((item: TextLine) => item.text).join(' ');
+
             try {
-                const description = await extractImageDescription(attachment.url);
-                indexingString += ` ${description}`;
+                const description = await extractImageDescription(blob);
+                indexingString += ` ${description} ${ocrDetect}`;
             } catch (error) {
                 console.error(`Error extracting image description for attachment ${attachment.url}:`, error);
             }
@@ -40,13 +52,11 @@ export default {
 
 const systemPrompt = 
 `Du bist ein Bildersuchmaschinen-Indexing-Bot.
-Anhand eines Bildes gibst du Stichwörter zurück, die dieses Bild beschreiben. Handelt es sich um Text, gib den Text zurück. Handelt es sich um Mathematik, so gebe Stichwörter zu der Mathematik zurück, beispielsweise Verfahrensfragen. Maximal 10 Stichwörter.
+Anhand eines Bildes gibst du Stichwörter zurück, die dieses Bild beschreiben. Handelt es sich um Mathematik, so gebe Stichwörter zu der Mathematik zurück, beispielsweise Verfahrensfragen. Maximal 10 Stichwörter.
 
 Gebe keine strukturierte Antwort aus. Den Text, sofern vorhanden, zuerst und anschließend pro Zeile die Stichwörter. Trenne diese beiden Bereiche nicht durch Text. Antworte nur auf Deutsch.`;
 
-async function extractImageDescription(attachmentURL: string): Promise<string> {
-    const image = await fetch(attachmentURL);
-    const blob: Blob = await image.blob();
+async function extractImageDescription(blob: Blob): Promise<string> {
     const imageSharp = await sharp(Buffer.from(await blob.arrayBuffer())).png().toBuffer();
     
     const description = await defaultOllamaQueue.chat({

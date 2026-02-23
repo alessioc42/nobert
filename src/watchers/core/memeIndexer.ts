@@ -2,22 +2,7 @@ import sharp from "sharp";
 import type { Message } from "discord.js";
 import { defaultMemeBase } from "../../database/memebase"
 import config from "../../config";
-
-let ocr: any = null;
-
-async function getOcr() {
-    if (!ocr) {
-        const Ocr = (await import('@gutenye/ocr-node')).default;
-        ocr = await Ocr.create();
-    }
-    return ocr;
-}
-
-type TextLine = {
-    mean: number;
-    text: string;
-    box: number[][];
-};
+import { getOcr, type TextLine } from "../../services/ocr";
 
 export default {
     name: "memeWatcher",
