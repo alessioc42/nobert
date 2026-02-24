@@ -6,11 +6,13 @@ export type Cron = {
     name: string;
     job: (client: Client) => void | Promise<void>;
     initialIze?: (client: Client) => void | Promise<void>;
+    enabled?: boolean;
 };
 
 export type CronModule = {
     moduleName: string;
     crons: Cron[];
+    enabled?: boolean;
 };
 
 export type CronList = CronModule[];

@@ -22,21 +22,35 @@ dotenv.config( {
  * 
  *  - KNOWLEDGEBASE_CHANNEL_IDS: Comma-separated list of channel IDs and parent channel IDs for knowledge bases (Channel, Category and Forum IDs)
  *  - KNOWLEDGEBASE_DATABASE_PATH: Path to the knowledge base database file (default: ./database/knowledgebase.db)
+ * 
+ *  - RAPLA_ENABLE: Enable Rapla functionality (default: false)
+ *  - RAPLA_DISCORD_CHANNEL_ID: Discord channel ID to post Rapla updates in (required if RAPLA_ENABLE is true)
+ *  - RAPLA_POLLING_CRON: Cron expression for polling Rapla (default: "0 * * * *" - every hour)
+ *  - RAPLA_COURSE_URL: URL of the Rapla course on the WEB
  */
 
 const config: {
     DISCORD_TOKEN: string;
     DISCORD_CLIENT_ID: string;
     DISCORD_GUILD_ID: string;
+    
     MEMEBASE_ENABLE: boolean;
     MEMEBASE_INDEXING_CHANNELS: string;
     MEMEBASE_PATH: string;
     MEMEBASE_IMAGE_COMPRESSION_QUALITY: number;
     MEMEBASE_MAX_IMAGE_DIMENSION: number;
+    
     OLLAMA_MODEL: string;
     OLLAMA_API_URL: string;
+    
     KNOWLEDGEBASE_CHANNEL_IDS: string;
     KNOWLEDGEBASE_DATABASE_PATH: string;
+
+    RAPLA_ENABLE?: boolean;
+    RAPLA_DISCORD_CHANNEL_ID?: string;
+    RAPLA_POLLING_CRON?: string;
+    RAPLA_COURSE_URL?: string;
+    RAPLA_SAVEPATH?: string;
 } = {
     DISCORD_TOKEN: process.env.DISCORD_TOKEN,
     DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
@@ -55,6 +69,11 @@ const config: {
     OLLAMA_API_URL: process.env.OLLAMA_API_URL || "http://localhost:11434",
     KNOWLEDGEBASE_CHANNEL_IDS: process.env.KNOWLEDGEBASE_CHANNEL_IDS,
     KNOWLEDGEBASE_DATABASE_PATH: process.env.KNOWLEDGEBASE_DATABASE_PATH || "./database/knowledgebase.db",
+    RAPLA_ENABLE: process.env.RAPLA_ENABLE ? process.env.RAPLA_ENABLE.toLowerCase() === "true" : false,
+    RAPLA_DISCORD_CHANNEL_ID: process.env.RAPLA_DISCORD_CHANNEL_ID,
+    RAPLA_POLLING_CRON: process.env.RAPLA_POLLING_CRON || "0 * * * *",
+    RAPLA_COURSE_URL: process.env.RAPLA_COURSE_URL,
+    RAPLA_SAVEPATH: process.env.RAPLA_SAVEPATH || "./database/rapla.json",
 };
 
 for (const [key, value] of Object.entries(config)) {
