@@ -27,6 +27,8 @@ dotenv.config( {
  *  - RAPLA_DISCORD_CHANNEL_ID: Discord channel ID to post Rapla updates in (required if RAPLA_ENABLE is true)
  *  - RAPLA_POLLING_CRON: Cron expression for polling Rapla (default: "0 * * * *" - every hour)
  *  - RAPLA_COURSE_URL: URL of the Rapla course on the WEB
+ * 
+ *  - USER_AUTO_REACT_JSON: JSON string mapping user IDs to arrays of emoji for automatic reactions (default: "{}")
  */
 
 const config: {
@@ -51,6 +53,8 @@ const config: {
     RAPLA_POLLING_CRON?: string;
     RAPLA_COURSE_URL?: string;
     RAPLA_SAVEPATH?: string;
+
+    USER_AUTO_REACT_JSON?: string;
 } = {
     DISCORD_TOKEN: process.env.DISCORD_TOKEN,
     DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
@@ -74,6 +78,8 @@ const config: {
     RAPLA_POLLING_CRON: process.env.RAPLA_POLLING_CRON || "0 * * * *",
     RAPLA_COURSE_URL: process.env.RAPLA_COURSE_URL,
     RAPLA_SAVEPATH: process.env.RAPLA_SAVEPATH || "./database/rapla.json",
+
+    USER_AUTO_REACT_JSON: process.env.USER_AUTO_REACT_JSON || "{}",
 };
 
 for (const [key, value] of Object.entries(config)) {
