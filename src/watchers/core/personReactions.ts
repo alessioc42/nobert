@@ -6,7 +6,10 @@ const userReacts: Record<string, string[]> = JSON.parse(configModule.USER_AUTO_R
 export default {
     name: "personReactor",
     canHandle: (message: Message): boolean => {
-        return message.author.id in userReacts;
+        if (Math.random() < 0.15) {
+            return message.author.id in userReacts;
+        }
+        return false;
     },
     handler: async (message: Message) => {
         const reactions = userReacts[message.author.id] ?? [];
