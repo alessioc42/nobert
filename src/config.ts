@@ -82,7 +82,28 @@ const config: {
     USER_AUTO_REACT_JSON: process.env.USER_AUTO_REACT_JSON || "{}",
 };
 
+const raplaKeys = new Set([
+    "RAPLA_ENABLE",
+    "RAPLA_DISCORD_CHANNEL_ID",
+    "RAPLA_POLLING_CRON",
+    "RAPLA_COURSE_URL",
+    "RAPLA_SAVEPATH",
+]);
+
+if (
+    config.RAPLA_ENABLE &&
+    (!config.RAPLA_DISCORD_CHANNEL_ID || !config.RAPLA_COURSE_URL)
+) {
+    console.warn(
+        "Rapla is enabled but RAPLA_DISCORD_CHANNEL_ID or RAPLA_COURSE_URL is not set. Disabling Rapla.",
+    );
+    config.RAPLA_ENABLE = false;
+}
+
 for (const [key, value] of Object.entries(config)) {
+    if (!config.RAPLA_ENABLE && raplaKeys.has(key)) {
+        continue;
+    }
     if (value === undefined || value === null || value === "") {
         console.error(
             `Warning: Configuration variable ${key} is not set. Exiting.`,
