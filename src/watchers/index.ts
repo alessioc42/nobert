@@ -3,6 +3,7 @@ import type { Message } from "discord.js";
 
 import memeIndexer from "./core/memeIndexer";
 import frenchWatcher from "./core/french";
+import personReactor from "./core/personReactions";
 
 import config from "../config";
 import postIndexer from "./core/postIndexer";
@@ -17,7 +18,8 @@ const handlers: {
 }[] = [
   memeIndexer,
   frenchWatcher,
-  postIndexer
+  postIndexer,
+  personReactor
 ];
 
 function setupMessageWatcher(client: Client) {
