@@ -4,6 +4,7 @@ import { defaultMemeBase } from "../../database/memebase";
 import { renderStats, type StatsRendererOptions } from "../../services/images/statsRenderer";
 import { defaultKnowledgebase } from "../../database/knowledgebase";
 import config from "../../config";
+import { defaultKuchenBase } from "../../database/kuchenbase";
 
 export default {
     data: new SlashCommandBuilder().setName("leaderboards").setDescription(
@@ -17,6 +18,10 @@ export default {
         .addSubcommand((subcommand) =>
             subcommand.setName("memes").setDescription(
                 "Leaderboard about the memebase",
+            )
+        ).addSubcommand((subcommand) =>
+            subcommand.setName("kuchen").setDescription(
+                "Leaderboard about Kuchen",
             )
         ),
     async execute(interaction: CommandInteraction) {
@@ -71,6 +76,25 @@ export default {
             interaction.reply({
                 files: [render],
             });
+        } else if (subcommand === "kuchen") {
+                const leaderboard = await defaultKuchenBase.leaderboardByAuthor();
+
+                const leaderboardWithAvatars = await leaderBoardInjectProfilePictures(interaction, {
+                    title: "Kuchen Leaderboard",
+                    subtitle: "Top 5 contributors",
+                    persons: leaderboard.map((entry) => ({
+                        name: entry.name,
+                        displayname: entry.displayname,
+                        avatarURL: "",
+                        value: entry.value,
+                    })),
+                });
+
+                const render = await renderStats(leaderboardWithAvatars);
+
+                interaction.reply({
+                    files: [render],
+                });
         }
     },
 };
